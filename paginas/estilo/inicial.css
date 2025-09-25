@@ -1,0 +1,24 @@
+* {
+    padding: 0%;
+    margin: 0%;
+}
+
+body {
+    background-color: white;
+}
+
+.logo {
+    align-items: self-start;
+}
+
+.navbar {
+    background: linear-gradient(to right, #061F40, #6155f5);
+    
+}
+
+a:link {
+    align-items: center;
+    color: azure;
+    text-decoration: none;
+    margin-inline: 20px;
+}
