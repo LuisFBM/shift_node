@@ -1,6 +1,6 @@
 <?php
 
-include_once "Objetos/controllers/usuarioController.php";
+include_once "objetos/controllers/usuarioController.php";
 include_once "topo.php";
 
 if($_SERVER['REQUEST_METHOD'] === "POST"){
