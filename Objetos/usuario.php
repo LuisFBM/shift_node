@@ -1,96 +1,67 @@
 <?php
 
-Class Usuario{
-
+class Usuario {
     public $id;
-
-    public $nome
-
-    public $email
-
+    public $nome;
+    public $email;
     public $senha;
-
     public $telefone;
-
+    public $whatsapp;
     public $cpf;
-
-    public $bd;
+    public $tipo; // CLIENTE, ATENDENTE, MECANICO, ADMIN
+    public $ativo;
+    private $bd;
 
     public function __construct($bd) {
         $this->bd = $bd;
     }
 
-     public function cadastrar(){
-        
-        $sql = "INSERT INTO usuario (nome, email, senha, telefone, cpf) VALUES (:nome, :email, :senha, :telefone, :cpf)";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->bindParam(':nome', $this->nome, PDO::PARAM_STR);
-        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-        $stmt->bindParam(':senha', $this->senha, PDO::PARAM_STR);
-        $stmt->bindParam(':telefone', $this->telefone, PDO::PARAM_STR);
-        $stmt->bindParam(':cpf', $this->cpf, PDO::PARAM_STR);
-
-        if($stmt->execute()){
-            return true;
+    // Ler todos os usuários ou filtrar por tipo
+    public function lerTodos($tipo = null){
+        $sql = "SELECT * FROM usuarios";
+        if($tipo){
+            $sql .= " WHERE tipo = :tipo";
+            $stmt = $this->bd->prepare($sql);
+            $stmt->bindParam(':tipo', $tipo);
         } else {
-            return false;
+            $stmt = $this->bd->prepare($sql);
         }
-    }
-
-    public function atualizar(){
-        $senha_hash = password_hash($this->senha, PASSWORD_DEFAULT);
-        
-        $sql = "UPDATE usuario SET nome = :nome, email = :email, senha = :senha, telefone = :telefone, cpf = :cpf WHERE id = :id";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->bindParam(':nome', $this->nome, PDO::PARAM_STR);
-        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-        $stmt->bindParam(':senha', $this->senha_hash, PDO::PARAM_STR);
-        $stmt->bindParam(':telefone', $this->telefone, PDO::PARAM_STR);
-        $stmt->bindParam(':cpf', $this->cpf, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-
-        if($stmt->execute()){
-            return true;
-        } else {
-            return false;
-        }
-
-           public function excluir(){
-        $sql = "DELETE FROM usuario WHERE id = :id";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-
-        if($stmt->execute()){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    }
-
-       public function login(){
-        $sql = "SELECT * FROM usuario WHERE email = :email";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
         $stmt->execute();
-
-        $resultado = $stmt->fetch(PDO::FETCH_OBJ);
-
-        if($resultado){
-        if(password_verify($this->senha, $resultado->senha)){
-            session_start();
-            $_SESSION['usuario'] = $resultado;
-            header("Location: index.php");
-            exit();
-        } else {
-            header("Location: login.php");
-            exit();
-            }
-        } 
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
-    
 
-}
+    // Buscar usuário pelo nome
+    public function lerUsuario($nome){
+        $nome = "%" . $nome . "%";
+        $sql = "SELECT * FROM usuarios WHERE nome LIKE :nome";
+        $stmt = $this->bd->prepare($sql);
+        $stmt->bindParam(':nome', $nome);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    // Buscar por ID
+    public function pesquisaUsuario($id){
+        $sql = "SELECT * FROM usuarios WHERE id_usuario = :id";
+        $stmt = $this->bd->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    // Cadastrar usuário
+    public function cadastrar(){
+        $sql = "INSERT INTO usuarios (nome, email, senha, telefone, whatsapp, cpf, tipo, ativo) 
+                VALUES (:nome, :email, :senha, :telefone, :whatsapp, :cpf, :tipo, :ativo)";
+        $stmt = $this->bd->prepare($sql);
+
+        $senha_hash = password_hash($this->senha, PASSWORD_DEFAULT);
+
+        $stmt->bindParam(':nome', $this->nome);
+        $stmt->bindParam(':email', $this->email);
+        $stmt->bindParam(':senha', $senha_hash);
+        $stmt->bindParam(':telefone', $this->telefone);
+        $stmt->bindParam(':whatsapp', $this->whatsapp);
+        $stmt->bindParam
 
 ?>
